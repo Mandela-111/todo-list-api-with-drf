@@ -13,6 +13,10 @@ class LoginSerializer(serializers.Serializer):
 
 
     def validate(self, data) :
+
+        if len(self.initial_data) > 2:
+            raise ValidationError("Payload contains too many items. Only username and password are allowed.")
+
         # we get the username and password from the data that's passed and authenticate it
         username = self.data.get('username').lower()
         username = "".join(username.split())
