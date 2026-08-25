@@ -1,13 +1,13 @@
-from typing import Any
-
+from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from rest_framework import serializers
 from rest_framework.serializers import Serializer, ValidationError
 
 
-class LoginSerializer(serializers.Serializer):
+class LoginSerializer(Serializer):
     #  what would the login serializer need? the username and password because
     username = serializers.CharField()
-    password = serializers.CharField()
+    password = serializers.CharField(write_only=True, allow_blank=False)
     #   there's no need to save to the database. After the fields, it then needs
     #   to be authenticated to confirm if the user exists.
 
