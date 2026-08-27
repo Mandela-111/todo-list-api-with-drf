@@ -1,15 +1,61 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-from rest_framework.serializers import Serializer, ValidationError
+from rest_framework.serializers import Serializer, ValidationError, ModelSerializer
 
+
+# TODO: create RegisterSerializer(inheriting from User model); validate username and password. Validate password??
+
+class RegisterSerializer(ModelSerializer):
+
+    confirm_password = serializers.CharField()
+
+    class Meta:
+        model = User
+        fields = ['username', 'password', 'email', 'confirm_password']
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'email': {'required': True, 'allow_blank': False}
+        }
+
+        def validate_confirm_password(self, value):
+
+            password = self.initial_data.get('password')
+
+            if password != value:
+                raise ValidationError("Passwords do not match")
+
+            return value
+
+        def validate_username(self, value):
+
+            username = "".join(value.split()).lower()
+
+            if User.objects.filter(username=username).exists():
+                raise serializers.ValidationError("Username already taken.")
+
+            return clean_name
+
+
+
+        def validate_email(self, value):
+            email = value.strip().lower()
+            if User.objects.filter(email__iexact=email).exists():
+                raise serializers.ValidationError("Email already in use.")
+            return email
+
+
+
+        def create(self, validated_data):
+            validated_data.pop('confirm_password', None) # for safety
+
+            return User.objects.create_user(**validated_data)
 
 class LoginSerializer(Serializer):
     #  what would the login serializer need? the username and password because
     username = serializers.CharField()
     password = serializers.CharField(write_only=True, allow_blank=False)
-    #   there's no need to save to the database. After the fields, it then needs
-    #   to be authenticated to confirm if the user exists.
+
 
 
     def validate(self, data) :
@@ -17,7 +63,6 @@ class LoginSerializer(Serializer):
         if len(self.initial_data) > 2:
             raise ValidationError("Payload contains too many items. Only username and password are allowed.")
 
-        # we get the username and password from the data that's passed and authenticate it
         username = data.get('username').lower()
         username = "".join(username.split())
         print(username)
