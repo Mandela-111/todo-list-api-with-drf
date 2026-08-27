@@ -18,21 +18,22 @@ class LoginSerializer(Serializer):
             raise ValidationError("Payload contains too many items. Only username and password are allowed.")
 
         # we get the username and password from the data that's passed and authenticate it
-        username = self.data.get('username').lower()
+        username = data.get('username').lower()
         username = "".join(username.split())
-        password = self.data.get('password')
+        print(username)
+        password = data.get('password')
 
         if username and password:
             user = authenticate(username=username, password=password)
 
-            if user:
-                data['user'] = user
-                return data
+            if not user:
+                raise ValidationError("Email or password is invalid")
 
             if not user.is_active:
                 raise ValidationError("This user account is inactive.")
 
-            raise ValidationError("Email or password is invalid")
+            data['user'] = user
+            return data
 
         raise ValidationError("Must include username and password")
 
