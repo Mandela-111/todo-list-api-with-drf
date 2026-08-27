@@ -1,7 +1,8 @@
 from django.urls import path
-from . import views
+from todo_app.views import loging, register
 
 
 urlpatterns = [
-    path('login', views.login)
+    path('login', login),
+    path('register', register)
 ]
