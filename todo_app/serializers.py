@@ -12,44 +12,46 @@ class RegisterSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'password', 'email', 'confirm_password']
+        fields = ['username', 'password', 'confirm_password', 'email']
         extra_kwargs = {
             'password': {'write_only': True},
             'email': {'required': True, 'allow_blank': False}
         }
 
-        def validate_confirm_password(self, value):
+    def validate_confirm_password(self, value):
 
-            password = self.initial_data.get('password')
+        password = self.initial_data.get('password')
 
-            if password != value:
-                raise ValidationError("Passwords do not match")
+        if password != value:
+                raise ValidationError({"confirm_password": "Passwords do not match"})
 
-            return value
+        return value
 
-        def validate_username(self, value):
+    def validate_username(self, value):
 
-            username = "".join(value.split()).lower()
+        username = "".join(value.split()).lower()
 
-            if User.objects.filter(username=username).exists():
-                raise serializers.ValidationError("Username already taken.")
+        if User.objects.filter(username=username).exists():
+            raise serializers.ValidationError("Username already taken.")
 
-            return clean_name
-
-
-
-        def validate_email(self, value):
-            email = value.strip().lower()
-            if User.objects.filter(email__iexact=email).exists():
-                raise serializers.ValidationError("Email already in use.")
-            return email
+        return username
 
 
 
-        def create(self, validated_data):
-            validated_data.pop('confirm_password', None) # for safety
+    def validate_email(self, value):
+        email = value.strip().lower()
+        if User.objects.filter(email__iexact=email).exists():
+            raise serializers.ValidationError("Email already in use.")
+        return email
 
-            return User.objects.create_user(**validated_data)
+
+
+    def create(self, validated_data):
+        validated_data.pop('confirm_password', None) # for safety
+
+        return User.objects.create_user(**validated_data)
+
+
 
 class LoginSerializer(Serializer):
     #  what would the login serializer need? the username and password because
@@ -83,6 +85,8 @@ class LoginSerializer(Serializer):
         raise ValidationError("Must include username and password")
 
 
-class UserListSerializer(serializers.Serializer):
-    model = User
-    fields = ['username', 'email']
+class UserListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email']
