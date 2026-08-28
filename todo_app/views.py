@@ -4,8 +4,9 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
+from django.contrib.auth.models import User
 
-from todo_app.serializers import LoginSerializer, RegisterSerializer
+from todo_app.serializers import LoginSerializer, RegisterSerializer, UserListSerializer
 
 
 # Create your views here.
@@ -52,6 +53,18 @@ class RegisterAPI(APIView):
             },
             status= status.HTTP_400_BAD_REQUEST
         )
+
+
+    def get(self, request):
+        users = User.objects.all()
+
+        serializer = UserListSerializer(users, many=True)
+
+        return Response({
+            "message": True,
+            "users": serializer.data,
+        }, status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 def login(request):

@@ -85,6 +85,8 @@ class LoginSerializer(Serializer):
         raise ValidationError("Must include username and password")
 
 
-class UserListSerializer(serializers.Serializer):
-    model = User
-    fields = ['username', 'email']
+class UserListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email']
