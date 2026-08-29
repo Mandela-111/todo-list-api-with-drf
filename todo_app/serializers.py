@@ -2,9 +2,12 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 from rest_framework.serializers import Serializer, ValidationError, ModelSerializer
+from todo_app.models import Tasks
 
 
-# TODO: create RegisterSerializer(inheriting from User model); validate username and password. Validate password??
+# TODO: Task Management. Foreign Keys are gonna be in here. Every User would have tasks which they would access with
+#  their auth Tokens, the rest are just CRUD
+#  A task model for creating tasks with a user foreign key
 
 class RegisterSerializer(ModelSerializer):
 
@@ -84,6 +87,12 @@ class LoginSerializer(Serializer):
 
         raise ValidationError("Must include username and password")
 
+
+
+class TasksSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tasks
+        fields = '__all__'
 
 class UserListSerializer(serializers.ModelSerializer):
 
