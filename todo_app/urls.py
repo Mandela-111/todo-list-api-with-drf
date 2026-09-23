@@ -1,8 +1,10 @@
 from django.urls import path
-from todo_app.views import login, RegisterAPI
+from todo_app.views import login, RegisterAPI, TasksAPI
 
 
 urlpatterns = [
     path('login', login),
-    path('register', RegisterAPI.as_view())
+    path('register', RegisterAPI.as_view()),
+    path('tasks', TasksAPI.as_view()),
+    path('tasks/<int:task_id>', TasksAPI.as_view())
 ]
