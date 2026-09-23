@@ -52,6 +52,11 @@ class RegisterSerializer(ModelSerializer):
     def create(self, validated_data):
         validated_data.pop('confirm_password', None) # for safety
 
+        if not validated_data.get('username') or not validated_data.get('password'):
+            raise ValidationError("Must include username and password")
+
+
+
         return User.objects.create_user(**validated_data)
 
 
@@ -93,6 +98,9 @@ class TasksSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tasks
         fields = '__all__'
+        extra_kwargs = {
+            "user": {"read_only": True}
+        }
 
 class UserListSerializer(serializers.ModelSerializer):
 
