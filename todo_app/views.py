@@ -197,7 +197,7 @@ def is_completed(request, task_id):
     serializer = TasksSerializer(task, data=data, partial=True)
 
     if serializer.is_valid():
-        task.isCompleted = data.isCompleted
+        task.isCompleted = data['isCompleted']
         serializer.save()
 
         return Response({
