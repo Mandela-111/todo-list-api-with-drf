@@ -183,3 +183,34 @@ class TasksAPI(APIView):
         return Response({
             "message": "Task deleted successfully"
         }, status=status.HTTP_200_OK)
+
+# TODO: a new api for marking if a task is complete or not. Now we're receiving data from our client
+@api_view(['PATCH'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def is_completed(request, task_id):
+    user = request.user
+    data = request.data
+
+    task = get_object_or_404(Tasks, id=task_id, user=user)
+
+    serializer = TasksSerializer(task, data=data, partial=True)
+
+    if serializer.is_valid():
+        task.isCompleted = data.isCompleted
+        serializer.save()
+
+        return Response({
+            "message": "Task completion edited successfully",
+            "task": serializer.data
+        }, status=status.HTTP_200_OK)
+
+    return Response(
+            {
+                "message": False,
+                "errors": serializer.errors
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
