@@ -214,3 +214,21 @@ def is_completed(request, task_id):
         )
 
 
+# TODO: One last api to retrieve all completed tasks by a user. Filtering is what we've got to do.
+#  We know what to do, we add the permission classes and everything. We filter both user and isCompleted.
+#  We serialize, then we return a  response.
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def completed_tasks(request):
+    user = request.user
+    data = request.data
+
+    tasks = Tasks.objects.filter(user=user, is_completed=True)
+
+    serializer = TasksSerializer(tasks, many=True)
+
+    return Response({
+        "message": "Retrieved all completed tasks successfully",
+        "data": [serializer.data]
+    }, status=status.HTTP_200_OK)
