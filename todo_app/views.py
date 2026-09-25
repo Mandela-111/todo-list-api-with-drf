@@ -224,7 +224,7 @@ def completed_tasks(request):
     user = request.user
     data = request.data
 
-    tasks = Tasks.objects.filter(user=user, is_completed=True)
+    tasks = Tasks.objects.filter(user=user, isCompleted=True)
 
     serializer = TasksSerializer(tasks, many=True)
 
